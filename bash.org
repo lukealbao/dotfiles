@@ -1,0 +1,141 @@
+#+TITLE:     Bash Profile
+#+AUTHOR:    Luke Albao
+#+EMAIL:     at gmail.com, lukealbao
+#+DATE:      <2016-07-19 Tue>
+#+PROPERTY: tangle ./.bashrc
+#+PROPERTY: comments org
+#+PROPERTY: shebang #! /usr/bin/env bash
+#+BEGIN_SRC sh
+#+END_SRC
+
+You can tangle this file (=C-c C-c T=), and it will output the file
+designated by the above tangle property. Currently, it is wimpy and
+writes the file locally. /TODO: find out how to do this
+programatically, say, from a makefile, and write directly to the
+correct target./
+
+Edit the section you need below, then re-generate the output script.
+
+* Environmental Variables
+Note: the environmental variables declared here are meant for personal
+use. Below, this file will source =~/.fp_localrc=, which should be
+used to overwrite anything here, as well as declare private things
+like passwords or remote endpoints.
+
+** Nodejs Environment
+#+BEGIN_SRC sh
+  export NODE_ENV="development"
+  export PATH=/usr/local/bin:$PATH
+#+END_SRC
+
+
+* Appearance
+Appearance stuff like prompts and color themes can go here.  
+
+** PS1 Prompt
+
+This is a mashup (and fixup) of two different prompts:
+- [[https://github.com/gf3/dotfiles/blob/v1.0.0/.bash_prompt][gf3]]
+- [[https://coderwall.com/p/pn8f0g/show-your-git-status-and-branch-in-color-at-the-command-prompt][coderwall]]
+
+It will create a pretty git-aware bash prompt. It should be stored as
+=~/.bash_prompt=, and it should be =source=d from =.bashrc=.
+
+We begin with our color palette.
+
+#+BEGIN_SRC sh
+  if [[ $COLORTERM = gnome-* && $TERM = xterm ]] \
+              && infocmp gnome-256color >/dev/null 2>&1; then
+      export TERM=gnome-256color
+   
+  elif [[ $TERM != dumb ]] && infocmp xterm-256color >/dev/null 2>&1; then
+      export TERM=xterm-256color
+  fi
+
+  MAGENTA="\033[0;31m"
+  ORANGE="\033[0;33m"
+  GREEN="\033[0;32m"
+  PURPLE="\033[0;35m"
+  WHITE="\033[1;37m"
+  RESET="\033[0;0m"
+
+  RESET="\033[0;0m"
+  BLACK="\033[0;30m"     
+  BLUE="\033[0;34m"     
+  CYAN="\033[0;36m"     
+  BROWN="\033[0;33m"     
+  LIGHTGRAY="\033[0;37m"
+  DARKGRAY="\033[1;30m"
+  LIGHTBLUE="\033[1;34m"
+  LIGHTGREEN="\033[1;32m"
+  LIGHTCYAN="\033[1;36m"
+  LIGHTRED="\033[1;31m"
+  LIGHTPURPLE="\033[1;35m"
+#+END_SRC
+
+*** Coloring According to git
+A git repository can be thought of as being in one of three states:
+
+1. Clean and ahead of remote (orange)
+2. Clean and up-to-date (green)
+3. Contains uncommitted changes (magenta)
+
+#+BEGIN_SRC sh
+  function git_color {
+      local git_status="$(git status 2> /dev/null)"
+      local git_diff="$(git diff 2> /dev/null)"
+
+      if [[ ! $git_diff && $git_status =~ "Your branch is ahead" ]]; then
+          echo -e $ORANGE;
+      elif [[ ! $git_diff ]]; then
+          echo -e $GREEN;
+      elif [[ $git_diff ]]; then
+          echo -e $MAGENTA;
+      fi
+  }
+#+END_SRC
+
+*** Determining which branch
+We want the prompt to show the current branch. In cases where we are
+in a detached state, we use the current commit instead.
+
+#+BEGIN_SRC sh
+  function git_branch {
+    local git_status="$(git status 2> /dev/null)"
+    local on_branch="On branch ([^${IFS}]*)"
+    local on_commit="HEAD detached at ([^${IFS}]*)"
+
+    if [[ $git_status =~ $on_branch ]]; then
+      local branch=${BASH_REMATCH[1]}
+      echo "($branch)"
+    elif [[ $git_status =~ $on_commit ]]; then
+      local commit=${BASH_REMATCH[1]}
+      echo "($commit)"
+    fi
+  }
+#+END_SRC
+
+*** Building PS1
+With all our git-color magic in place, let's build the prompt:
+
+#+BEGIN_SRC sh
+PS1="\[${MAGENTA}\][\[${CYAN}\]fp\[${MAGENTA}\]]" # hostname
+PS1+="\[$LIGHTGRAY\]:\[$GREEN\]\w" # cwd
+PS1+="\[$LIGHTGRAY\]\$([[ -n \$(git branch 2> /dev/null) ]] && echo \" on \")" # git_dir?...
+PS1+="\[\$(git_color)\]\$(git_branch)" # ... then colorize the branch
+PS1+="\[$RESET\]\n\$ \[$RESET\]" # new line and actual prompt
+#+END_SRC
+
+
+* External Sources
+
+External sources happen here. =~/.fp_localrc= is special in the sense
+that it should be created for each computer that uses this bash
+profile. It should provide special endpoints, passwords, etc. for
+running any app you need. 
+
+#+BEGIN_SRC sh
+  [[ -f "$HOME/.aliases" ]] && source "$HOME/.aliases"
+  [[ -f "$HOME/.fp_localrc" ]] && source "$HOME/.fp_localrc"
+#+END_SRC
+
