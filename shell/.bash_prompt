@@ -1,0 +1,94 @@
+#! /usr/bin/env bash
+#
+# A mashup (and fixup) of 
+# The colorful https://github.com/gf3/dotfiles/blob/v1.0.0/.bash_prompt
+# The git-friendly https://coderwall.com/p/pn8f0g/show-your-git-status-and-branch-in-color-at-the-command-prompt
+#
+##################
+#
+# Parsing "git status" is problematic because redirecting it (git status 2> /dev/null)
+# actually returns a successful "clean directory" message, even when the directory is
+# dirty, which defeats the whole purpose. (February 2015)
+#
+# The workaround here is to count on "git diff" instead. But simply replacing it in gf3's code
+# will cause unwanted errors in directories that aren't git repos. By placing it in a
+# local variable and putting it in a conditional expression, the effect is achieved without
+# the git errors being printed to stdout.
+
+
+if [[ $COLORTERM = gnome-* && $TERM = xterm ]]  && infocmp gnome-256color >/dev/null 2>&1; then export TERM=gnome-256color
+elif [[ $TERM != dumb ]] && infocmp xterm-256color >/dev/null 2>&1; then export TERM=xterm-256color
+fi
+
+# if tput setaf 1 &> /dev/null; then
+#     tput sgr0
+#     if [[ $(tput colors) -ge 256 ]] 2>/dev/null; then
+#         MAGENTA=$(tput setaf 9)
+#         ORANGE=$(tput setaf 172)
+#         GREEN=$(tput setaf 190)
+#         PURPLE=$(tput setaf 141)
+#         WHITE=$(tput setaf 0)        
+#     else
+#         MAGENTA=$(tput setaf 5)
+#         ORANGE=$(tput setaf 4)
+#         GREEN=$(tput setaf 2)
+#         PURPLE=$(tput setaf 1)
+#         WHITE=$(tput setaf 7)
+#     fi
+#     BOLD=$(tput bold)
+#     RESET=$(tput sgr0)
+# else
+    MAGENTA="\033[0;31m"
+    ORANGE="\033[0;33m"
+    GREEN="\033[0;32m"
+    PURPLE="\033[0;35m"
+    WHITE="\033[1;37m"
+    RESET="\033[0;0m"
+
+    RESET="\033[0;0m"
+    BLACK="\033[0;30m"     
+    BLUE="\033[0;34m"     
+    CYAN="\033[0;36m"     
+    BROWN="\033[0;33m"     
+    LIGHTGRAY="\033[0;37m"
+    DARKGRAY="\033[1;30m"
+    LIGHTBLUE="\033[1;34m"
+    LIGHTGREEN="\033[1;32m"
+    LIGHTCYAN="\033[1;36m"
+    LIGHTRED="\033[1;31m"
+    LIGHTPURPLE="\033[1;35m"
+
+# fi
+
+function git_color {
+    local git_status="$(git status 2> /dev/null)"
+    local git_diff="$(git diff 2> /dev/null)"
+
+    if [[ ! $git_diff && $git_status =~ "Your branch is ahead" ]]; then
+        echo -e $ORANGE;
+    elif [[ ! $git_diff ]]; then
+        echo -e $GREEN;
+    elif [[ $git_diff ]]; then
+        echo -e $MAGENTA;
+    fi
+}
+
+function git_branch {
+  local git_status="$(git status 2> /dev/null)"
+  local on_branch="On branch ([^${IFS}]*)"
+  local on_commit="HEAD detached at ([^${IFS}]*)"
+
+  if [[ $git_status =~ $on_branch ]]; then
+    local branch=${BASH_REMATCH[1]}
+    echo "($branch)"
+  elif [[ $git_status =~ $on_commit ]]; then
+    local commit=${BASH_REMATCH[1]}
+    echo "($commit)"
+  fi
+}
+
+PS1="\[${MAGENTA}\][\[${CYAN}\]fp\[${MAGENTA}\]]" # hostname
+PS1+="\[$LIGHTGRAY\]:\[$GREEN\]\w" # cwd
+PS1+="\[$LIGHTGRAY\]\$([[ -n \$(git branch 2> /dev/null) ]] && echo \" on \")" # git_dir?...
+PS1+="\[\$(git_color)\]\$(git_branch)" # ... then colorize the branch
+PS1+="\[$RESET\]\n\$ \[$RESET\]" # new line and actual prompt

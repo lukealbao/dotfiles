@@ -1,0 +1,9 @@
+#! /usr/bin/env bash
+
+alias dev="cd ~/Dropbox/dev"
+alias ll="ls -Gflah"
+alias node="node --harmony"
+alias ..="cd .."
+alias ~="cd $HOME"
+alias myip="curl http://ipinfo.io/ip"
+alias gemacs="open /Applications/Emacs.app/"
