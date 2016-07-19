@@ -1,0 +1,29 @@
+#+TITLE:     Bash Aliases
+#+AUTHOR:    Luke Albao
+#+EMAIL:     at gmail.com, lukealbao
+#+DATE:      <2016-07-19 Tue>
+#+PROPERTY: tangle ./.aliases
+#+PROPERTY: comments org
+#+PROPERTY: shebang #! /usr/bin/env bash
+#+BEGIN_SRC sh
+#+END_SRC
+
+You can tangle this file (=C-c C-c T=), and it will output the file
+designated by the above tangle property. Currently, it is wimpy and
+writes the file locally.
+
+* Simple Stuff
+Keyboard shortcuts & whatnot
+
+#+BEGIN_SRC sh
+  alias dev="cd ~/Documents/fpdev"
+  alias ll="ls -Gflah"
+  alias node="node --harmony"
+  alias ..="cd .."
+  alias ~="cd $HOME"
+  alias myip="curl http://ipinfo.io/ip"
+  alias gemacs="open /Applications/Emacs.app/"
+#+END_SRC
+
+* Custom Functions
+Would go here

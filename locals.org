@@ -1,0 +1,25 @@
+#+TITLE:     Local Bash Environment
+#+AUTHOR:    Luke Albao
+#+EMAIL:     at gmail.com, lukealbao
+#+DATE:      <2016-07-19 Tue>
+#+PROPERTY: tangle ./.fp_localrc
+#+PROPERTY: comments org
+#+PROPERTY: shebang #! /usr/bin/env bash
+
+Any local environmental variables or aliases that should not be shared
+across all machines goes in this file, so any installation-specific
+info should be created as a new file. For example and
+comphrehensiveness, here is the one that is used on your local dev
+box. 
+
+#+BEGIN_SRC sh
+  export DB_ADAPTER=mysql
+  export DB_HOST=localhost
+  export DB_USER=root
+  export DB_PASSWORD=
+  export DB_DATABASE=decision_dev
+  export DB_PORT=3306
+  export AWS_ACCESS_KEY=none
+  export AWS_SECRET_KEY=none
+  export AWS_REGION=none
+#+END_SRC
