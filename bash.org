@@ -1,14 +1,14 @@
 #+TITLE:     Bash Profile
 #+AUTHOR:    Luke Albao
 #+EMAIL:     at gmail.com, lukealbao
-#+DATE:      <2016-07-19 Tue>
+#+DATE:      <2016-07-20 Wed>
 #+PROPERTY: tangle ./.bashrc
 #+PROPERTY: comments org
 #+PROPERTY: shebang #! /usr/bin/env bash
 #+BEGIN_SRC sh
 #+END_SRC
 
-You can tangle this file (=C-c C-c T=), and it will output the file
+You can tangle this file (=C-c C-v T=), and it will output the file
 designated by the above tangle property. Currently, it is wimpy and
 writes the file locally. /TODO: find out how to do this
 programatically, say, from a makefile, and write directly to the
@@ -22,12 +22,33 @@ use. Below, this file will source =~/.fp_localrc=, which should be
 used to overwrite anything here, as well as declare private things
 like passwords or remote endpoints.
 
+** Hostnames etc
+We don't want to step on other peoples' toes by renaming hosts, so we
+set a "hostname" to use at the prompt here. This default value should
+be overwritten by ~/.fp_localrc
+
+#+BEGIN_SRC sh
+export FP_HOSTNAME=fp
+#+END_SRC
+
 ** Nodejs Environment
 #+BEGIN_SRC sh
   export NODE_ENV="development"
   export PATH=/usr/local/bin:$PATH
 #+END_SRC
 
+
+* External Sources
+
+External sources happen here. =~/.fp_localrc= is special in the sense
+that it should be created for each computer that uses this bash
+profile. It should provide special endpoints, passwords, etc. for
+running any app you need. 
+
+#+BEGIN_SRC sh
+  [[ -f "$HOME/.aliases" ]] && source "$HOME/.aliases"
+  [[ -f "$HOME/.fp_localrc" ]] && source "$HOME/.fp_localrc"
+#+END_SRC
 
 * Appearance
 Appearance stuff like prompts and color themes can go here.  
@@ -119,23 +140,11 @@ in a detached state, we use the current commit instead.
 With all our git-color magic in place, let's build the prompt:
 
 #+BEGIN_SRC sh
-PS1="\[${MAGENTA}\][\[${CYAN}\]fp\[${MAGENTA}\]]" # hostname
+PS1="\[${MAGENTA}\][\[${CYAN}\]$FP_HOSTNAME\[${MAGENTA}\]]" # hostname
 PS1+="\[$LIGHTGRAY\]:\[$GREEN\]\w" # cwd
 PS1+="\[$LIGHTGRAY\]\$([[ -n \$(git branch 2> /dev/null) ]] && echo \" on \")" # git_dir?...
 PS1+="\[\$(git_color)\]\$(git_branch)" # ... then colorize the branch
 PS1+="\[$RESET\]\n\$ \[$RESET\]" # new line and actual prompt
 #+END_SRC
 
-
-* External Sources
-
-External sources happen here. =~/.fp_localrc= is special in the sense
-that it should be created for each computer that uses this bash
-profile. It should provide special endpoints, passwords, etc. for
-running any app you need. 
-
-#+BEGIN_SRC sh
-  [[ -f "$HOME/.aliases" ]] && source "$HOME/.aliases"
-  [[ -f "$HOME/.fp_localrc" ]] && source "$HOME/.fp_localrc"
-#+END_SRC
 
