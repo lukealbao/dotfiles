@@ -40,6 +40,13 @@ export FP_HOSTNAME=fp
 
 * External Sources
 
+#+BEGIN_SRC sh
+  # Global
+  if [ -f /etc/bashrc ]; then
+      source /etc/bashrc
+  fi
+#+END_SRC
+
 External sources happen here. =~/.fp_localrc= is special in the sense
 that it should be created for each computer that uses this bash
 profile. It should provide special endpoints, passwords, etc. for
